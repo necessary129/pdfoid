@@ -15,9 +15,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
+from smart_webdriver_manager import ChromeDriverManager
+
+cdm = ChromeDriverManager()
+driver_path = cdm.get_driver()
+browser_path = cdm.get_browser()
+
 
 
 class DirectSeleniumBackend(object):
@@ -82,8 +86,9 @@ class DirectSeleniumWorker(object):
     def html_to_pdf(self, *, header_template, footer_template, wait_for):
         options = webdriver.ChromeOptions()
         options.add_argument('--headless')
+        options.binary_location = browser_path
 
-        browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+        browser = webdriver.Chrome(service=Service(executable_path=driver_path), options=options)
         browser.get('file://%s' % self.input_html_file)
 
         if wait_for is not None:
