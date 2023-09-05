@@ -15,11 +15,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+
 
 class DirectSeleniumBackend(object):
     def __init__(self):
         self.chromedriver_path = os.environ.get('CHROMEDRIVER_PATH', 'chromedriver')
-        self.chrome_path = os.environ.get('CHROME_PATH')
         self.exiftool_path = os.environ.get('EXIFTOOL_PATH', 'exiftool')
 
     @gen.coroutine
@@ -79,9 +82,8 @@ class DirectSeleniumWorker(object):
     def html_to_pdf(self, *, header_template, footer_template, wait_for):
         options = webdriver.ChromeOptions()
         options.add_argument('--headless')
-        options.binary_location = self.backend.chrome_path
 
-        browser = webdriver.Chrome(options=options)
+        browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
         browser.get('file://%s' % self.input_html_file)
 
         if wait_for is not None:
